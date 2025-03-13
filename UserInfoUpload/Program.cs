@@ -17,8 +17,8 @@ namespace UserInfoUpload
             // Configure Entity Framework Core
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-            builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
-                .AddNegotiate();
+            //builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+            //    .AddNegotiate();
 
             var app = builder.Build();
 
