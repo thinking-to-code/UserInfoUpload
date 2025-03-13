@@ -1,0 +1,22 @@
+﻿@model UserInfoUpload.Models.User
+
+<h2>User Details</h2>
+<p><strong>First Name:</strong> @Model.FirstName</p>
+<p><strong>Last Name:</strong> @Model.LastName</p>
+<p><strong>Email:</strong> @Model.Email</p>
+
+<h3>Uploaded Images</h3>
+
+<h4>Profile Images</h4>
+@foreach (var image in Model.UserImages)
+{
+    <img src="@image.ImagePath" width="150" height="150" style="margin: 5px; border-radius: 5px;" />
+}
+
+<h4>Driving License Images</h4>
+@foreach (var image in Model.DrivingLicenseImages)
+{
+    <img src="@image.ImagePath" width="150" height="150" style="margin: 5px; border-radius: 5px;" />
+}
+
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

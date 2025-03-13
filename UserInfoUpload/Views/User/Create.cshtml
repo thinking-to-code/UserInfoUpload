@@ -1,0 +1,97 @@
+﻿@model UserInfoUpload.Models.User
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Add User Detail(s)</h1>
+
+<h4>User</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Profile Picture(s)</label>                
+                <input type="file" name="ProfileImages" multiple class="form-control" id="profileImagesInput" accept="image/*" />
+                <div id="profileImagesPreview"></div>
+                <input type="hidden" id="profileImagesList" name="profileImagesList" />
+            </div>
+
+            <div class="form-group">
+                <label>Driving License Pictures(Front and Back)</label>
+                <input type="file" name="DrivingLicenseImages" multiple class="form-control" id="drivingLicenseImagesInput" accept="image/*" />                
+                <div id="drivingLicenseImagesPreview"></div>
+                <input type="hidden" id="drivingLicenseImagesList" name="drivingLicenseImagesList" />
+            </div>
+
+            <button type="submit" class="btn btn-primary m-2">Save</button>
+        </form>
+    </div>
+</div>
+
+<div>
+    @* <a asp-action="Index">Back to List</a> *@
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        function validateFiles(input) {
+            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
+
+            for (const file of input.files) {
+                if (!allowedTypes.includes(file.type)) {
+                    alert(`Invalid file type: ${file.name}. Please upload only image files.`);
+                    input.value = ""; // Reset the input field
+                    return false;
+                }
+                if (file.size > maxSize) {
+                    alert(`File too large: ${file.name}. Max allowed size is 10MB.`);
+                    input.value = ""; // Reset the input field
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        document.getElementById('profileImagesInput').addEventListener('change', function () {
+            if (validateFiles(this)) {
+                displayFileNames(this, 'profileImagesPreview', 'profileImagesList');
+            }
+        });
+
+        document.getElementById('drivingLicenseImagesInput').addEventListener('change', function () {
+            if (validateFiles(this)) {
+                displayFileNames(this, 'drivingLicenseImagesPreview', 'drivingLicenseImagesList');
+            }
+        });
+    </script>
+
+}
