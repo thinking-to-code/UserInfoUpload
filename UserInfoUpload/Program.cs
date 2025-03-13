@@ -12,6 +12,7 @@ namespace UserInfoUpload
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddSession(); // Enable session
 
             // Configure Entity Framework Core
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -31,7 +32,7 @@ namespace UserInfoUpload
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseSession(); // Enable session before routing
             app.UseRouting();
 
             app.UseAuthorization();

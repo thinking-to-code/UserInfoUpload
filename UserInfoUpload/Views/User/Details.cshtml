@@ -8,15 +8,52 @@
 <h3>Uploaded Images</h3>
 
 <h4>Profile Images</h4>
-@foreach (var image in Model.UserImages)
-{
-    <img src="@image.ImagePath" width="150" height="150" style="margin: 5px; border-radius: 5px;" />
-}
+<div class="row">
+    @foreach (var image in Model.UserImages)
+    {
+        <div class="col-md-3">
+            <img src="@image.ImagePath" width="150" height="150" class="img-thumbnail img-gallery"
+                 style="margin: 5px; border-radius: 5px; cursor: pointer;"
+                 onclick="openModal('@image.ImagePath')" />
+        </div>
+    }
+</div>
 
 <h4>Driving License Images</h4>
-@foreach (var image in Model.DrivingLicenseImages)
-{
-    <img src="@image.ImagePath" width="150" height="150" style="margin: 5px; border-radius: 5px;" />
-}
+<div class="row">
+    @foreach (var image in Model.DrivingLicenseImages)
+    {
+        <div class="col-md-3">
+            <img src="@image.ImagePath" width="150" height="150" class="img-thumbnail img-gallery"
+                 style="margin: 5px; border-radius: 5px; cursor: pointer;"
+                 onclick="openModal('@image.ImagePath')" />
+        </div>
+    }
+</div>
 
 <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+
+<!-- Bootstrap Modal for Image Preview -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openModal(imageSrc) {
+            document.getElementById("modalImage").src = imageSrc;
+            var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            myModal.show();
+        }
+    </script>
+}

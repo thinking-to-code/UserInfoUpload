@@ -8,10 +8,11 @@ namespace UserInfoUpload.Controllers
     public class UserController : Controller
     {
         private readonly ApplicationDbContext _context;
-
-        public UserController(ApplicationDbContext context)
+        private readonly IConfiguration _configuration;
+        public UserController(ApplicationDbContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: User
@@ -19,7 +20,42 @@ namespace UserInfoUpload.Controllers
         {
             var currentUser = User.Identity.Name;
 
-            return View(await _context.Users.Include(u => u.UserImages).Include(u => u.DrivingLicenseImages).ToListAsync());
+            if (HttpContext.Session.GetString("IsAuthenticated") == "true")
+            {
+                var users = await _context.Users.Include(u => u.UserImages).Include(u => u.DrivingLicenseImages).ToListAsync(); // Replace with your actual data retrieval logic
+                return View(users);
+            }
+
+            return RedirectToAction("EnterPassword");
+        }
+
+        // Show password input form
+        public IActionResult EnterPassword()
+        {
+            return View();
+        }
+
+        // Validate Password
+        [HttpPost]
+        public IActionResult EnterPassword(string password)
+        {
+            var correctPassword = _configuration["AdminPassword"]; // Get password from appsettings.json
+
+            if (password == correctPassword)
+            {
+                HttpContext.Session.SetString("IsAuthenticated", "true");
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.Error = "Incorrect password. Try again.";
+            return View();
+        }
+
+        // Logout (optional)
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Remove("IsAuthenticated");
+            return RedirectToAction("EnterPassword");
         }
 
         // GET: User/Create

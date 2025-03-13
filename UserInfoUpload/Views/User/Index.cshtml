@@ -4,47 +4,6 @@
     ViewData["Title"] = "Index";
 }
 
-@* <p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table> *@
-
-
 <h2>ITI Employees List</h2>
 <a asp-action="Create" class="btn btn-success">Add New User</a>
 
@@ -69,13 +28,13 @@
                 <td>
                     @foreach (var image in user.UserImages)
                     {
-                        <img src="@image.ImagePath" alt="Profile Image" width="50" height="50" style="border-radius: 5px;" />
+                        <img src="@image.ImagePath" alt="Profile Image" width="50" height="50" style="border-radius: 5px; cursor: pointer" onclick="openModal('@image.ImagePath')" />
                     }
                 </td>
                 <td>
                     @foreach (var image in user.DrivingLicenseImages)
                     {
-                        <img src="@image.ImagePath" alt="Driving License Image" width="50" height="50" style="border-radius: 5px;" />
+                        <img src="@image.ImagePath" alt="Driving License Image" width="50" height="50" style="border-radius: 5px; cursor: pointer" onclick="openModal('@image.ImagePath')" />
                     }
                 </td>
                 <td>
@@ -86,3 +45,29 @@
         }
     </tbody>
 </table>
+
+
+<!-- Bootstrap Modal for Image Preview -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="modalImage" src="" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function openModal(imageSrc) {
+            document.getElementById("modalImage").src = imageSrc;
+            var myModal = new bootstrap.Modal(document.getElementById('imageModal'));
+            myModal.show();
+        }
+    </script>
+}
