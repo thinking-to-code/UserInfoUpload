@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using UserInfoUpload.Data;
 using UserInfoUpload.Models;
+using UserInfoUpload.Services;
 
 namespace UserInfoUpload.Controllers
 {    
@@ -9,10 +10,12 @@ namespace UserInfoUpload.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
-        public UserController(ApplicationDbContext context, IConfiguration configuration)
+        private readonly FaceDetectionService _faceDetectionService;
+        public UserController(ApplicationDbContext context, IConfiguration configuration, FaceDetectionService faceDetectionService)
         {
             _context = context;
             _configuration = configuration;
+            _faceDetectionService = faceDetectionService;
         }
 
         // GET: User
@@ -195,5 +198,49 @@ namespace UserInfoUpload.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+
+        // GET: User/FaceDetection
+        public IActionResult FaceDetection()
+        {
+            return View();
+        }
+
+        // POST: User/FaceDetection
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> FaceDetection(IFormFile imageFile)
+        {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                const long maxFileSize = 20 * 1024 * 1024; // 20MB
+
+                if (!imageFile.ContentType.StartsWith("image/"))
+                {
+                    ModelState.AddModelError("ProfileImages", "Only image files are allowed.");
+                }
+                if (imageFile.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("ProfileImages", "Each image file must be 20MB or less.");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(imageFile.FileName);
+                    string uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", uniqueFileName);
+
+                    using (var stream = new FileStream(uploadPath, FileMode.Create))
+                    {
+                        await imageFile.CopyToAsync(stream);
+                    }
+
+                    var faceImagePaths = _faceDetectionService.DetectAndSaveFaces(uploadPath);
+                    ViewBag.FaceImagePaths = faceImagePaths;
+                    ViewBag.SelectedImagePath = $"/images/{uniqueFileName}";
+                }
+            }
+
+            return View();
+        }
+
     }    
 }

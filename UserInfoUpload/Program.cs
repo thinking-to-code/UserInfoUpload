@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using Microsoft.EntityFrameworkCore;
 using UserInfoUpload.Data;
+using UserInfoUpload.Services;
 
 namespace UserInfoUpload
 {
@@ -13,6 +14,9 @@ namespace UserInfoUpload
             // Add services to the container.
             builder.Services.AddControllersWithViews();
             builder.Services.AddSession(); // Enable session
+            
+            // Register the FaceDetectionService
+            builder.Services.AddScoped<FaceDetectionService>();
 
             // Configure Entity Framework Core
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
