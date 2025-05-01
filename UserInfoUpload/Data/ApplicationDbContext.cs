@@ -11,6 +11,8 @@ namespace UserInfoUpload.Data
         public DbSet<User> Users { get; set; }
         public DbSet<UserImage> UserImages { get; set; }
         public DbSet<DrivingLicenseImage> DrivingLicenseImages { get; set; }
+        public DbSet<RealIdImage> RealIdImages { get; set; }
         public DbSet<DrivingLicenseInfo> DrivingLicenseInfos { get; set; }
+        public DbSet<UserAttemptHistory> UserAttemptHistories { get; set; }
     }
 }

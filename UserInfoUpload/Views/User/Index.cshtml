@@ -13,7 +13,8 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            <th>Profile Pictures</th>
+            <th>Selfie</th>
+            <th>Real ID</th>
             <th>Driving License</th>
             <th>Actions</th>
         </tr>
@@ -32,6 +33,12 @@
                     }
                 </td>
                 <td>
+                    @foreach (var image in user.RealIdImages)
+                    {
+                        <img src="@image.ImagePath" alt="Profile Image" width="50" height="50" style="border-radius: 5px; cursor: pointer" onclick="openModal('@image.ImagePath')" />
+                    }
+                </td>
+                <td>
                     @foreach (var image in user.DrivingLicenseImages)
                     {
                         <img src="@image.ImagePath" alt="Driving License Image" width="50" height="50" style="border-radius: 5px; cursor: pointer" onclick="openModal('@image.ImagePath')" />
@@ -39,7 +46,9 @@
                 </td>
                 <td>
                     <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-info">View</a>
-                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-info">Delete</a>
+                    <a asp-action="Edit" asp-route-id="@user.Id" class="btn btn-warning">Edit</a>                    
+                    <a asp-action="Delete" asp-route-id="@user.Id" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?');">Delete</a>
+
                 </td>
             </tr>
         }

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using UserInfoUpload.Data;
 
@@ -11,9 +12,11 @@ using UserInfoUpload.Data;
 namespace UserInfoUpload.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250501111948_RealIdImagesTableCreated")]
+    partial class RealIdImagesTableCreated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -156,42 +159,6 @@ namespace UserInfoUpload.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("UserInfoUpload.Models.UserAttemptHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Details")
-                        .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Similarity")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserAttemptHistories");
-                });
-
             modelBuilder.Entity("UserInfoUpload.Models.UserImage", b =>
                 {
                     b.Property<int>("Id")
@@ -247,17 +214,6 @@ namespace UserInfoUpload.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("UserInfoUpload.Models.UserAttemptHistory", b =>
-                {
-                    b.HasOne("UserInfoUpload.Models.User", "User")
-                        .WithMany("UserAttemptsHistories")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("UserInfoUpload.Models.UserImage", b =>
                 {
                     b.HasOne("UserInfoUpload.Models.User", "User")
@@ -274,8 +230,6 @@ namespace UserInfoUpload.Migrations
                     b.Navigation("DrivingLicenseImages");
 
                     b.Navigation("RealIdImages");
-
-                    b.Navigation("UserAttemptsHistories");
 
                     b.Navigation("UserImages");
                 });

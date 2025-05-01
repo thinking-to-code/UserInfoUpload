@@ -5,12 +5,11 @@
 }
 
 <h1>Verify Driving License</h1>
-
-@* <h4>User</h4> *@
 <hr />
 
 <div class="row">
-    <div class="col-md-4">
+    <!-- Driving License Upload Section -->
+    <div class="col-md-6">
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success">
@@ -23,61 +22,60 @@
                 @TempData["ErrorMessage"]
             </div>
         }
-
-        <form asp-action="Upload" method="post" enctype="multipart/form-data">
-
-            @* <div class="form-group">
-                <label asp-for="FirstName" class="control-label"></label>
-                <input asp-for="FirstName" class="form-control" />
-                <span asp-validation-for="FirstName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="LastName" class="control-label"></label>
-                <input asp-for="LastName" class="form-control" />
-                <span asp-validation-for="LastName" class="text-danger"></span>
-            </div>    *@      
-
-            <div class="form-group">
-                <label>Driving License Pictures(Front and Back)</label>
-                <input type="file" name="DrivingLicenseImages" multiple class="form-control" id="drivingLicenseImagesInput" accept="image/*" />
-                <div id="drivingLicenseImagesPreview"></div>
-                <input type="hidden" id="drivingLicenseImagesList" name="drivingLicenseImagesList" />
-            </div>
-
-            <div class="form-group">
-                <label>Selfie</label>
-                <input type="file" name="ProfileImages" multiple class="form-control" id="profileImagesInput" accept="image/*" />
-                <div id="profileImagesPreview"></div>
-                <input type="hidden" id="profileImagesList" name="profileImagesList" />
-            </div>
-
-            
-            <div>
-                <p>Note: Hold down Ctrl key to select multiple files</p>
-            </div>
-            <button type="submit" class="btn btn-primary m-2">Save</button>
-        </form>
-
         @if (TempData["Similarity"] != null)
         {
             <div class="alert alert-success">
                 @TempData["Similarity"]
             </div>
         }
+
+        <h3>Driving License</h3>
+        <form asp-action="Upload" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Real ID or Driving License Pictures (Front and Back)</label>
+                <input type="file" name="DrivingLicenseImages" multiple class="form-control" id="drivingLicenseImagesInput" accept="image/*" />
+                <div id="drivingLicenseImagesPreview" class="mt-2"></div>
+            </div>
+            <hr />
+
+            <!-- Selfie Upload or Capture Section -->
+            <h3>Selfie</h3>
+            <div class="form-group">
+                <label>Upload Selfie</label>
+                <input type="file" name="ProfileImages" class="form-control" id="profileImagesInput" accept="image/*" />
+                <div id="profileImagesPreview" class="mt-2"></div>
+            </div>
+
+            <div class="form-group mt-3">
+                <label>Or Capture Selfie Using Webcam</label>
+                <div>
+                    <video id="video" autoplay class="border" style="width: 100%; max-height: 300px;"></video>
+                    <button type="button" id="captureButton" class="btn btn-primary mt-2">Capture</button>
+                </div>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <img id="capturedImage" class="img-thumbnail mt-3" style="display:none; max-width: 100%;" />
+                <input type="hidden" id="capturedImageInput" name="capturedImage" />
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-success">Submit for Verification</button>
+            </div>
+        </form>
+
+        
+
     </div>
 </div>
 
-<div>
-    @* <a asp-action="Index">Back to List</a> *@
-</div>
-
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
     <script>
+        // Validate uploaded files
         function validateFiles(input) {
-            const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+            const maxSize = 20 * 1024 * 1024; // 10MB in bytes
             const allowedTypes = ["image/jpeg", "image/png", "image/gif", "image/bmp", "image/webp"];
 
             for (const file of input.files) {
@@ -95,17 +93,66 @@
             return true;
         }
 
+        // Display file previews
+        function displayFilePreview(input, previewContainerId) {
+            const previewContainer = document.getElementById(previewContainerId);
+            previewContainer.innerHTML = ""; // Clear previous previews
+
+            for (const file of input.files) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement("img");
+                    img.src = e.target.result;
+                    img.className = "img-thumbnail m-2";
+                    img.style.maxWidth = "100px";
+                    img.style.maxHeight = "100px";
+                    previewContainer.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Event listeners for file inputs
         document.getElementById('profileImagesInput').addEventListener('change', function () {
             if (validateFiles(this)) {
-                displayFileNames(this, 'profileImagesPreview', 'profileImagesList');
+                displayFilePreview(this, 'profileImagesPreview');
             }
         });
 
         document.getElementById('drivingLicenseImagesInput').addEventListener('change', function () {
             if (validateFiles(this)) {
-                displayFileNames(this, 'drivingLicenseImagesPreview', 'drivingLicenseImagesList');
+                displayFilePreview(this, 'drivingLicenseImagesPreview');
             }
         });
-    </script>
 
+        // Webcam functionality
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('captureButton');
+        const capturedImageInput = document.getElementById('capturedImageInput');
+        const capturedImage = document.getElementById('capturedImage');
+
+        // Access the camera
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing the camera: ", err);
+            });
+
+        // Capture the image
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert the canvas to a Base64 image
+            const imageData = canvas.toDataURL('image/png');
+            capturedImageInput.value = imageData; // Set the hidden input value
+            capturedImage.src = imageData; // Display the captured image
+            capturedImage.style.display = 'block';
+        });
+    </script>
 }

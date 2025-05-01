@@ -6,6 +6,8 @@ namespace UserInfoUpload.Models
     {
         public int Id { get; set; }
 
+        public int UserId { get; set; }
+
         [StringLength(100)]
         public string DrivingLicenseNumber { get; set; }
 
@@ -29,6 +31,7 @@ namespace UserInfoUpload.Models
 
         public string FrontDrivingLicenseImagePath { get; set; }
         public string BackDrivingLicenseImagePath { get; set; }
-        
+
+        public User User { get; set; }
     }
 }
