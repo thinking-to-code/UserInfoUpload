@@ -143,18 +143,21 @@ namespace UserInfoUpload.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upload(List<IFormFile> DrivingLicenseImages, string capturedImage)
+        public async Task<IActionResult> Upload(List<IFormFile> DrivingLicenseImages, List<IFormFile> ProfileImages,  string capturedImage = "")
         {
             const long maxFileSize = 20 * 1024 * 1024; // 20MB
 
             if (DrivingLicenseImages == null || DrivingLicenseImages.Count == 0)
             {
-                ModelState.AddModelError("DrivingLicenseImages", "Please upload at least one driving license image.");
-            }
-
-            if (string.IsNullOrEmpty(capturedImage))
+                string errorMessage = "Please upload at least one driving license image.";
+                ModelState.AddModelError("DrivingLicenseImages", errorMessage);
+                TempData["ErrorMessage"] = errorMessage;
+            }            
+            if ((ProfileImages == null || ProfileImages.Count == 0) && string.IsNullOrEmpty(capturedImage))
             {
+                string errorMessage = "Please provide a selfie image (either uploaded or captured).";
                 ModelState.AddModelError("capturedImage", "Please provide a selfie image (either uploaded or captured).");
+                TempData["ErrorMessage"] = errorMessage;
             }
 
             if (ModelState.IsValid)
@@ -179,6 +182,7 @@ namespace UserInfoUpload.Controllers
 
                     // Save the captured selfie image
                     string selfieImagePath = null;
+                    string profileImagePath = null;
                     if (!string.IsNullOrEmpty(capturedImage))
                     {
                         string uniqueFileName = Guid.NewGuid().ToString() + ".png";
@@ -187,6 +191,24 @@ namespace UserInfoUpload.Controllers
                         // Convert Base64 string to image and save
                         var imageBytes = Convert.FromBase64String(capturedImage.Split(',')[1]);
                         await System.IO.File.WriteAllBytesAsync(selfieImagePath, imageBytes);
+                    }
+                    else
+                    {
+                        // Save the selfie image
+                        
+                        foreach (var profileImage in ProfileImages)
+                        {
+                            if (profileImage.Length > 0)
+                            {
+                                string uniqueFileName = Guid.NewGuid().ToString() + Path.GetExtension(profileImage.FileName);
+                                profileImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/images", uniqueFileName);
+
+                                using (var stream = new FileStream(profileImagePath, FileMode.Create))
+                                {
+                                    await profileImage.CopyToAsync(stream);
+                                }
+                            }
+                        }
                     }
 
                     // Detect faces in the driving license image
@@ -198,18 +220,31 @@ namespace UserInfoUpload.Controllers
                     }
 
                     // Detect faces in the selfie image
-                    var selfieFaces = _faceDetectionService.DetectAndSaveFaces(selfieImagePath);
-                    if (selfieFaces.Count == 0)
+                    List<(string, string)> profileImageFaces = new List<(string, string)>();
+                    if (string.IsNullOrEmpty(selfieImagePath))
                     {
-                        TempData["ErrorMessage"] = "No face detected in the selfie image.";
-                        return RedirectToAction(nameof(Upload));
+                        profileImageFaces = _faceDetectionService.DetectAndSaveFaces(profileImagePath);
+                        if (profileImageFaces.Count == 0)
+                        {
+                            TempData["ErrorMessage"] = "No face detected in the Selfie image.";
+                            return RedirectToAction(nameof(Upload));
+                        }
+                    }
+                    else
+                    {
+                        profileImageFaces = _faceDetectionService.DetectAndSaveFaces(selfieImagePath);
+                        if (profileImageFaces.Count == 0)
+                        {
+                            TempData["ErrorMessage"] = "No face detected in the selfie image.";
+                            return RedirectToAction(nameof(Upload));
+                        }
                     }
 
                     // Compare faces and calculate similarity
                     decimal highestSimilarity = -10;
                     foreach (var licenseFace in drivingLicenseFaces)
                     {
-                        foreach (var selfieFace in selfieFaces)
+                        foreach (var selfieFace in profileImageFaces)
                         {
                             var faceMatchResult = await _faceDetectionService.MatchFaces(licenseFace.Item2, selfieFace.Item2);
                             var faceMatchResponse = JsonConvert.DeserializeObject<FaceMatchResponse>(faceMatchResult);
