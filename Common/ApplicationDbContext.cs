@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using UserInfoUpload.Models;
+﻿using Common.Models;
+using Microsoft.EntityFrameworkCore;
 
-namespace UserInfoUpload.Data
+namespace Common
 {
     public class ApplicationDbContext : DbContext
     {

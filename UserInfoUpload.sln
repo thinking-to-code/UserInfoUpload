@@ -1,9 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35806.99 d17.13
+VisualStudioVersion = 17.13.35806.99
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserInfoUpload", "UserInfoUpload\UserInfoUpload.csproj", "{F2D14C94-26C8-4F33-A58B-F51A55BA59E8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserInfoUpload.API", "UserInfoUpload.API\UserInfoUpload.API.csproj", "{8C78EF52-2CE3-4CDF-8299-264D061AE511}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{78AE9B2E-287A-4926-B7BF-531FC1AE12DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{F2D14C94-26C8-4F33-A58B-F51A55BA59E8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F2D14C94-26C8-4F33-A58B-F51A55BA59E8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F2D14C94-26C8-4F33-A58B-F51A55BA59E8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C78EF52-2CE3-4CDF-8299-264D061AE511}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C78EF52-2CE3-4CDF-8299-264D061AE511}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C78EF52-2CE3-4CDF-8299-264D061AE511}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C78EF52-2CE3-4CDF-8299-264D061AE511}.Release|Any CPU.Build.0 = Release|Any CPU
+		{78AE9B2E-287A-4926-B7BF-531FC1AE12DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{78AE9B2E-287A-4926-B7BF-531FC1AE12DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{78AE9B2E-287A-4926-B7BF-531FC1AE12DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{78AE9B2E-287A-4926-B7BF-531FC1AE12DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
