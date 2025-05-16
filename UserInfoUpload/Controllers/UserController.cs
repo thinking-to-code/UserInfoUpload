@@ -191,21 +191,23 @@ namespace UserInfoUpload.Controllers
                             using (var stream = new FileStream(uploadPath, FileMode.Create))
                             {
                                 await image.CopyToAsync(stream);
-                            }                            
-
-                            // Save image details in database
-                            _context.DrivingLicenseImages.Add(new DrivingLicenseImage
-                            {
-                                UserId = user.Id,                                
-                                ImagePath = "/images/" + uniqueFileName
-                            });
+                            }
 
                             // Parse the PDF417 Barcode and store license info
                             var aamvaText = ironBarcode.DecodeBarcode(new System.Drawing.Bitmap(uploadPath), uploadPath);
-                            var driverLicenseInfoModel = ironBarcode.ParseAamvaToModel(aamvaText);
-                            driverLicenseInfoModel.UserId = user.Id;
+                            var driverLicenseImageModel = ironBarcode.ParseAamvaToModel(aamvaText);
+                            driverLicenseImageModel.UserId = user.Id;
+                            driverLicenseImageModel.ImagePath = "/images/" + uniqueFileName;
 
-                            _context.DrivingLicenseInfos.Add(driverLicenseInfoModel);
+                            // Save image details in database
+                            _context.DrivingLicenseImages.Add(driverLicenseImageModel);
+
+                            // Parse the PDF417 Barcode and store license info
+                            //var aamvaText = ironBarcode.DecodeBarcode(new System.Drawing.Bitmap(uploadPath), uploadPath);
+                            //var driverLicenseInfoModel = ironBarcode.ParseAamvaToModel(aamvaText);
+                            //driverLicenseInfoModel.UserId = user.Id;
+
+                            //_context.DrivingLicenseInfos.Add(driverLicenseInfoModel);
                         }
                     }
                     await _context.SaveChangesAsync();

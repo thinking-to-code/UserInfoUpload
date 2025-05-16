@@ -251,23 +251,37 @@ namespace UserInfoUpload.Controllers
 
                             if (faceMatchResponse?.Similarity > highestSimilarity)
                             {
-                                highestSimilarity = faceMatchResponse.Similarity;
+                                highestSimilarity = faceMatchResponse.Similarity * 100;
                             }
                         }
                     }
 
                     //TODO: Fix it
-                    // Save the result in the database (optional)
-                    //var userAttemptHistory = new UserAttemptHistory
-                    //{
-                    //    UserId = 0, // Replace with the actual user ID if available
-                    //    TimeStamp = DateTime.UtcNow,
-                    //    Result = highestSimilarity >= 80 ? "Success" : "Fail", // Example threshold: 80%
-                    //    Details = $"Driving License vs Selfie Comparison",
-                    //    Similarity = $"{highestSimilarity}%"
-                    //};
-                    //_context.UserAttemptHistories.Add(userAttemptHistory);
-                    //await _context.SaveChangesAsync();
+                    //Save the result in the database(optional)
+
+                    IronBarcodeReaderService barcodeReaderService = new IronBarcodeReaderService(_configuration);
+                    var barcodeDecodedText = barcodeReaderService.DecodeBarcode(new System.Drawing.Bitmap(drivingLicenseImagePath), drivingLicenseImagePath);
+                    var barcodeDetails = barcodeReaderService.ParseAamvaToModel(barcodeDecodedText);
+
+                    //Read matching user from DB
+                    if (!string.IsNullOrEmpty(barcodeDetails.LicenseNumber))
+                    {
+                        var fromDBUser = _context.DrivingLicenseImages.FirstOrDefault(p => p.LicenseNumber == barcodeDetails.LicenseNumber);
+                        if (fromDBUser != null)
+                        {
+                            var userAttemptHistory = new UserAttemptHistory
+                            {
+                                UserId = fromDBUser.UserId, // Replace with the actual user ID if available
+                                TimeStamp = DateTime.UtcNow,
+                                Result = highestSimilarity >= 80 ? "Success" : "Fail", // Example threshold: 80%
+                                Details = $"Driving License vs Selfie Comparison",
+                                Similarity = $"{highestSimilarity}%"
+                            };
+                            _context.UserAttemptHistories.Add(userAttemptHistory);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    
 
                     // Display the result to the user
                     TempData["Similarity"] = $"Similarity: {highestSimilarity}%";

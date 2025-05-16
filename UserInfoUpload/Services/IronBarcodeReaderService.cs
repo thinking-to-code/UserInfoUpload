@@ -62,9 +62,9 @@ namespace UserInfoUpload.Services
             }
         }
 
-        public DrivingLicenseInfo ParseAamvaToModel(string raw)
+        public DrivingLicenseImage ParseAamvaToModel(string raw)
         {
-            var model = new DrivingLicenseInfo();
+            var model = new DrivingLicenseImage();
             var lines = raw.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (var line in lines)
