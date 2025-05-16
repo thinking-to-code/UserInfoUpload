@@ -180,6 +180,7 @@ namespace UserInfoUpload.Controllers
 
                 if (DrivingLicenseImages != null && DrivingLicenseImages.Count > 0)
                 {
+                    IronBarcodeReaderService ironBarcode = new IronBarcodeReaderService(_configuration);
                     foreach (var image in DrivingLicenseImages)
                     {
                         if (image.Length > 0)
@@ -190,7 +191,7 @@ namespace UserInfoUpload.Controllers
                             using (var stream = new FileStream(uploadPath, FileMode.Create))
                             {
                                 await image.CopyToAsync(stream);
-                            }
+                            }                            
 
                             // Save image details in database
                             _context.DrivingLicenseImages.Add(new DrivingLicenseImage
@@ -198,6 +199,13 @@ namespace UserInfoUpload.Controllers
                                 UserId = user.Id,                                
                                 ImagePath = "/images/" + uniqueFileName
                             });
+
+                            // Parse the PDF417 Barcode and store license info
+                            var aamvaText = ironBarcode.DecodeBarcode(new System.Drawing.Bitmap(uploadPath), uploadPath);
+                            var driverLicenseInfoModel = ironBarcode.ParseAamvaToModel(aamvaText);
+                            driverLicenseInfoModel.UserId = user.Id;
+
+                            _context.DrivingLicenseInfos.Add(driverLicenseInfoModel);
                         }
                     }
                     await _context.SaveChangesAsync();

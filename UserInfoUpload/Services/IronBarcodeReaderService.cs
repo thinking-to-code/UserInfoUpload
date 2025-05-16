@@ -1,6 +1,7 @@
 ﻿using IronBarCode;
 using System.Drawing;
 using System.Text;
+using UserInfoUpload.Models;
 
 namespace UserInfoUpload.Services
 {
@@ -49,16 +50,62 @@ namespace UserInfoUpload.Services
                 int i = 1;
                 foreach (BarcodeResult result in results)
                 {
-                    sb.AppendLine($"Barcode Result {i++}: {result.Text}");
+                    sb.Append(result.Text);
+                    //sb.AppendLine($"Barcode Result {i++}: {result.Text}");
                 }
 
                 return sb.ToString();
             }
             else
             {
-                return "No PDF417 barcode detected.";
+                return "";
             }
         }
+
+        public DrivingLicenseInfo ParseAamvaToModel(string raw)
+        {
+            var model = new DrivingLicenseInfo();
+            var lines = raw.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+
+            foreach (var line in lines)
+            {
+                if (line.Length < 3) continue;
+                var code = line.Substring(0, 3);
+                var value = line.Substring(3).Trim();
+
+                switch (code)
+                {
+                    case "DAQ": model.LicenseNumber = value; break;
+                    case "DCS": model.LastName = value; break;
+                    case "DAC": model.FirstName = value; break;
+                    case "DAD": model.MiddleName = value; break;
+                    case "DBB": model.DateOfBirth = value; break;
+                    case "DBC": model.Sex = value; break;
+                    case "DBA": model.ExpirationDate = value; break;
+                    case "DBD": model.IssueDate = value; break;
+                    case "DBJ": model.IssuingJurisdiction = value; break;
+                    case "DBK": model.SocialSecurityNumber = value; break;
+                    case "DBH": model.OrganDonor = value; break;
+                    case "DBI": model.Address = value; break;
+                    case "DBL": model.Class = value; break;
+                    case "DBM": model.Restrictions = value; break;
+                    case "DBN": model.Endorsements = value; break;
+                    case "DBP": model.CustomerId = value; break;
+                    case "DBQ": model.PlaceOfBirth = value; break;
+                    case "DAG": model.StreetAddress = value; break;
+                    case "DAI": model.City = value; break;
+                    case "DAJ": model.State = value; break;
+                    case "DAK": model.PostalCode = value; break;
+                    case "DCF": model.DocumentDiscriminator = value; break;
+                    case "DCG": model.Country = value; break;
+                    case "DCH": model.FederalCompliance = value; break;
+                        // Add more as needed
+                }
+            }
+
+            return model;
+        }
+
 
         public void ReadBarcode(string imagePath)
         {
